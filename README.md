@@ -158,14 +158,57 @@ git add -A && git commit -m "docs: 新增 xxx 笔记" && git push
 
 拿到 `pages.dev` 域名后，建议把它填进 `site.config.mjs` 的 `url`，这样 RSS 和 sitemap 里的链接才是完整绝对地址。
 
-> 如果不用 Cloudflare Pages，可以删掉或改造 `.github/workflows/deploy.yml`，
-> 否则它会在每次推送时尝试部署到 GitHub Pages 并失败。
+### 方案 B：GitHub Pages（备用）
 
-### 方案 B：GitHub Pages（免费）
+仓库里**没有**预置 GitHub Pages 的部署工作流（避免和 Cloudflare Pages 重复构建）。
+如果以后想改用 GitHub Pages，把下面的内容存成 `.github/workflows/deploy.yml`：
 
-1. 把项目推到一个 GitHub 仓库（`main` 分支）
-2. 打开仓库 **Settings → Pages**，把 **Source** 改成 **GitHub Actions**
-3. 如果站点地址是 `https://用户名.github.io/仓库名/`，修改 `site.config.mjs`：
+```yaml
+name: Build and Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm run build
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+然后：
+
+1. 打开仓库 **Settings → Pages**，把 **Source** 改成 **GitHub Actions**
+2. 如果站点地址是 `https://用户名.github.io/仓库名/`，修改 `site.config.mjs`：
 
    ```js
    base: '/仓库名',   // 注意：前后不要多加斜杠
@@ -174,7 +217,7 @@ git add -A && git commit -m "docs: 新增 xxx 笔记" && git push
 
    > 这一步不能漏。否则 CSS 和页面跳转会 404，因为站点不在域名根目录下。
 
-4. 推送代码，Actions 会自动构建部署
+3. 推送代码，Actions 会自动构建部署
 
 绑定自定义域名时，`base` 改回 `''`，`url` 改成自己的域名，并在仓库 Pages 设置里填 Custom domain。
 
