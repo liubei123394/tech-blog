@@ -1,0 +1,22 @@
+{
+  "name": "devnotes",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "简约技术博客：用零依赖 Node 脚本把 Markdown 编译成静态站点",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "build": "node scripts/build.mjs",
+    "preview": "node scripts/serve.mjs",
+    "new": "node scripts/new-post.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "blog",
+    "static-site",
+    "markdown"
+  ],
+  "license": "MIT"
+}
