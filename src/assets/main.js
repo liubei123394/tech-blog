@@ -313,11 +313,69 @@
         if (!first && visible.has(head.id)) first = head.id;
       });
       tocLinks.forEach(function (a) { a.classList.remove('active'); });
-      if (first && map[first]) map[first].classList.add('active');
+      if (first && map[first]) {
+        map[first].classList.add('active');
+        // 目录跟随滚动：把当前高亮项滚动到目录可视范围内
+        if (map[first].scrollIntoViewIfNeeded) {
+          map[first].scrollIntoViewIfNeeded(false);
+        } else {
+          map[first].scrollIntoView({ block: 'nearest' });
+        }
+      }
     }, { rootMargin: '-84px 0px -68% 0px', threshold: 0 });
     Object.keys(map).forEach(function (id) {
       var el = document.getElementById(id);
       if (el) obs.observe(el);
+    });
+  }
+
+  /* ------------------------- 移动端悬浮目录按钮 ------------------------- */
+
+  var tocAside = $('.toc');
+  if (tocAside) {
+    var tocFab = document.createElement('button');
+    tocFab.className = 'toc-fab';
+    tocFab.type = 'button';
+    tocFab.setAttribute('aria-label', '打开目录');
+    tocFab.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">'
+      + '<path d="M2.5 4h13M2.5 9h9M2.5 14h13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+    document.body.appendChild(tocFab);
+
+    var tocModal = document.createElement('div');
+    tocModal.className = 'toc-modal';
+    tocModal.hidden = true;
+    tocModal.innerHTML = '<div class="toc-sheet" role="dialog" aria-label="文章目录">'
+      + '<div class="toc-sheet-head"><span class="toc-title">本页目录</span>'
+      + '<button class="toc-close" type="button" aria-label="关闭目录">✕</button></div>'
+      + '<nav class="toc-sheet-body">' + tocAside.innerHTML.replace(/<p class="toc-title">[\s\S]*?<\/p>/, '') + '</nav>'
+      + '</div>';
+    document.body.appendChild(tocModal);
+
+    var sheetLinks = $$('.toc-sheet-body a', tocModal);
+    var openToc = function () {
+      tocModal.hidden = false;
+      document.body.style.overflow = 'hidden';
+    };
+    var closeToc = function () {
+      tocModal.hidden = true;
+      document.body.style.overflow = '';
+    };
+
+    tocFab.addEventListener('click', openToc);
+    tocModal.addEventListener('click', function (e) {
+      if (e.target === tocModal) closeToc();
+    });
+    $('.toc-close', tocModal).addEventListener('click', closeToc);
+    sheetLinks.forEach(function (a) {
+      a.addEventListener('click', function () {
+        closeToc();
+        var id = decodeURIComponent(a.getAttribute('href').slice(1));
+        var el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && tocModal && !tocModal.hidden) closeToc();
     });
   }
 })();
