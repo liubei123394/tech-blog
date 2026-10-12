@@ -59,7 +59,7 @@ export default {
 
   // ---------- 页脚 ----------
   footer: {
-    brand: 'DevNotes · 开发笔记',
+    brand: '双非小文学AI 的博客',
     note: '本站使用零依赖 Node 脚本生成静态页面，源码托管在 GitHub。',
   },
 };

@@ -102,9 +102,21 @@ a:hover { color: var(--accent); }
 }
 
 .header-inner {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: flex-start;
   gap: 20px; height: 62px;
 }
+
+.nav-avatar {
+  flex-shrink: 0; display: inline-flex;
+  border-radius: 50%; line-height: 0;
+}
+.nav-avatar img {
+  width: 38px; height: 38px; display: block;
+  border-radius: 50%; object-fit: cover;
+  border: 2px solid var(--border);
+  transition: border-color .15s;
+}
+.nav-avatar:hover img { border-color: var(--accent); }
 
 .brand { display: flex; align-items: center; gap: 10px; color: var(--text); flex-shrink: 0; }
 .brand:hover { color: var(--text); }
@@ -554,6 +566,11 @@ a:hover { color: var(--accent); }
 .footer-links { display: flex; flex-direction: column; gap: 9px; }
 .footer-links a { font-size: 13.5px; color: var(--text-2); }
 .footer-links a:hover { color: var(--accent); }
+.footer-qr {
+  display: block; width: 120px; max-width: 100%; height: auto;
+  margin: 4px 0 0; border-radius: 10px;
+  border: 1px solid var(--border);
+}
 .footer-bottom {
   display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
   padding: 16px 24px 26px; font-size: 12.5px; color: var(--text-3);
@@ -627,7 +644,8 @@ a:hover { color: var(--accent); }
   .wrap, .section, .page-head { padding-left: 18px; padding-right: 18px; }
 
   .nav-toggle { display: flex; }
-  .header-inner { height: 56px; }
+  .header-inner { height: 56px; gap: 14px; }
+  .nav-avatar img { width: 34px; height: 34px; }
 
   .site-nav {
     position: absolute; top: 100%; left: 0; right: 0;

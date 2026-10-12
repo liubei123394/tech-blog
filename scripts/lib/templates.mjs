@@ -101,6 +101,7 @@ ${page.extraHead || ''}
 <a class="skip" href="#main">跳到正文</a>
 <header class="site-header">
   <div class="wrap header-inner">
+    <a class="nav-avatar" href="${url('/')}" aria-label="返回首页" title="返回首页"><img src="${url('/assets/avatar.png')}" alt="头像" width="38" height="38"></a>
     <button class="nav-toggle" type="button" aria-label="展开导航" aria-expanded="false"><span></span><span></span><span></span></button>
     <nav class="site-nav" aria-label="主导航">${nav}
       <button class="icon-btn search-open" type="button" aria-label="搜索">⌕</button>
@@ -140,7 +141,7 @@ ${content}
       site.wechat && site.wechat.name
         ? `<div class="footer-col footer-wechat">
       <p class="footer-brand">公众号</p>
-      <p class="footer-note">${h(site.wechat.name)} · ${h(site.wechat.slogan || '')}</p>
+      <img class="footer-qr" src="${url('/assets/wechat-qr.jpg')}" alt="${h(site.wechat.name)}公众号二维码" width="120" height="120" loading="lazy">
     </div>`
         : ''
     }
