@@ -101,10 +101,6 @@ ${page.extraHead || ''}
 <a class="skip" href="#main">跳到正文</a>
 <header class="site-header">
   <div class="wrap header-inner">
-    <a class="brand" href="${url('/')}">
-      <span class="brand-mark">&lt;/&gt;</span>
-      <span class="brand-text"><strong>${h(site.title)}</strong><em>${h(site.subtitle)}</em></span>
-    </a>
     <button class="nav-toggle" type="button" aria-label="展开导航" aria-expanded="false"><span></span><span></span><span></span></button>
     <nav class="site-nav" aria-label="主导航">${nav}
       <button class="icon-btn search-open" type="button" aria-label="搜索">⌕</button>
@@ -131,7 +127,7 @@ ${content}
 <footer class="site-footer">
   <div class="wrap footer-inner">
     <div class="footer-col">
-      <p class="footer-brand">${h(site.title)} · ${h(site.subtitle)}</p>
+      <p class="footer-brand">${h(site.footer.brand || `${site.title} · ${site.subtitle}`)}</p>
       <p class="footer-note">${h(site.footer.note)}</p>
     </div>
     <div class="footer-col footer-links">

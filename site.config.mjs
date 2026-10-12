@@ -6,8 +6,8 @@ export default {
   title: 'DevNotes',
   subtitle: '开发手记',
   description: '记录 AI 编程学习、实战小项目、开发工具使用与 Bug 排查解决的全过程。',
-  author: '你的名字',
-  email: 'you@example.com',
+  author: '双非小文学AI',
+  email: '1846417893@qq.com',
 
   // ---------- 部署 ----------
   // 站点完整地址（用于 RSS / sitemap / og:url）。绑定自定义域名后改成自己的域名。
@@ -16,7 +16,7 @@ export default {
   // 把 base 改成 '/仓库名'；部署到 Vercel / Netlify / 自定义域名时保持空字符串。
   base: '',
   // 源码仓库地址，文章页会生成「编辑此页」链接
-  repo: 'https://github.com/yourname/devnotes',
+  repo: 'https://github.com/liubei123394/tech-blog',
   repoBranch: 'main',
   // 网站备案号（留空则不显示）
   icp: '',
@@ -45,7 +45,7 @@ export default {
   // 每篇文章右上角有「复制到公众号」按钮，会复制带内联样式的富文本，
   // 直接粘贴进公众号编辑器即可保留排版。
   wechat: {
-    name: '你的公众号名称',
+    name: '双非小文学AI',
     slogan: '同步更新，欢迎关注',
   },
 
@@ -59,6 +59,7 @@ export default {
 
   // ---------- 页脚 ----------
   footer: {
+    brand: 'DevNotes · 开发笔记',
     note: '本站使用零依赖 Node 脚本生成静态页面，源码托管在 GitHub。',
   },
 };
