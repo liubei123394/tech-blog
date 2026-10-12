@@ -101,7 +101,7 @@ ${page.extraHead || ''}
 <a class="skip" href="#main">跳到正文</a>
 <header class="site-header">
   <div class="wrap header-inner">
-    <a class="nav-avatar" href="${url('/')}" aria-label="返回首页" title="返回首页"><img src="${url('/assets/avatar.png')}" alt="头像" width="38" height="38"></a>
+    <a class="nav-avatar" href="${url('/')}" aria-label="返回首页" title="返回首页"><img src="${url('/assets/avatar.png')}" alt="头像" width="40" height="40"></a>
     <button class="nav-toggle" type="button" aria-label="展开导航" aria-expanded="false"><span></span><span></span><span></span></button>
     <nav class="site-nav" aria-label="主导航">${nav}
       <button class="icon-btn search-open" type="button" aria-label="搜索">⌕</button>
