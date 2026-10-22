@@ -132,12 +132,22 @@ function collectPosts() {
     const plain = blocksToText(blocks);
     const title = str(data.title) || file.replace(/\.md$/i, '');
     const summary = str(data.summary) || str(data.description) || plain.slice(0, 110) + (plain.length > 110 ? '…' : '');
+    // 封面专用摘要：不受草稿 120 字限制，取完整 frontmatter 摘要或正文前 200 字（封面模板自适应换行展示）
+    const rawCover = str(data.summary) || str(data.description) || plain.replace(/\s+/g, ' ').trim();
+    const coverSummary = (() => {
+      if (rawCover.length <= 200) return rawCover;
+      const head = rawCover.slice(0, 200);
+      // 切到最后一个句读符号，避免半句话戛然而止
+      const cut = Math.max(...['。', '！', '？', '；', '!', '?', ';'].map((p) => head.lastIndexOf(p)));
+      return cut > 60 ? head.slice(0, cut + 1) : head;
+    })();
 
     out.push({
       file,
       slug: file.replace(/\.md$/i, ''),
       title: title.slice(0, 64), // 官方限制 64 字
       summary: summary.slice(0, 119), // 官方限制 120 字
+      coverSummary,
       date: str(data.date) || file.slice(0, 10),
       tags: Array.isArray(data.tags) ? data.tags : (str(data.tags) ? [str(data.tags)] : []),
       minutes: readingTime(plain),

@@ -64,7 +64,7 @@ export async function generateCoverFiles(post, opts = {}) {
 
   const { svg, template } = buildCoverSVG({
     title: post.title,
-    summary: post.summary,
+    summary: post.coverSummary || post.summary,
     tags: post.tags || [],
     date: post.date,
     brand: opts.brand,

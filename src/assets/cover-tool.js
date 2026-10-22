@@ -172,9 +172,11 @@
     var accentColor = accent || theme.accent;
     var fit = fitLines(title, [104, 92, 80, 70, 62], maxW, 2);
     var titleSize = fit.size, titleLH = titleSize * 1.26;
-    // 摘要最多 3 行，行距放宽，保证完整展示
-    var sumLines = summary ? wrapText(summary, 36, maxW, 3) : [];
-    var sumLH = 36 * 1.6;
+    // 摘要自适应字号，最多 4 行——装不下自动缩小字号（36→26px），保证完整展示不出现省略号
+    var sumFit = summary ? fitLines(summary, [36, 32, 28, 26], maxW, 4) : null;
+    var sumLines = sumFit ? sumFit.lines : [];
+    var sumSize = sumFit ? sumFit.size : 36;
+    var sumLH = sumSize * 1.6;
     var metaH = 130;
     var blockH = fit.lines.length * titleLH + (sumLines.length ? 34 + sumLines.length * sumLH : 0);
     var y = Math.round((COVER_H - metaH - blockH) / 2 + titleSize);
@@ -195,9 +197,9 @@
     for (var i = 0; i < fit.lines.length; i++) {
       parts.push('<text x="' + textX + '" y="' + Math.round(y + i * titleLH) + '" font-family="' + FONT + '" font-size="' + titleSize + '" font-weight="700" fill="' + theme.title + '">' + esc(fit.lines[i]) + '</text>');
     }
-    var sy = y + (fit.lines.length - 1) * titleLH + 34 + 36;
+    var sy = y + (fit.lines.length - 1) * titleLH + 34 + sumSize;
     for (var j = 0; j < sumLines.length; j++) {
-      parts.push('<text x="' + textX + '" y="' + Math.round(sy) + '" font-family="' + FONT + '" font-size="36" fill="' + theme.summary + '">' + esc(sumLines[j]) + '</text>');
+      parts.push('<text x="' + textX + '" y="' + Math.round(sy) + '" font-family="' + FONT + '" font-size="' + sumSize + '" fill="' + theme.summary + '">' + esc(sumLines[j]) + '</text>');
       sy += sumLH;
     }
     var metaY = COVER_H - 66;

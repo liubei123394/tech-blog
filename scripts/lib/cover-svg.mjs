@@ -223,9 +223,11 @@ export function buildCoverSVG(options = {}) {
   const titleSize = fit.size;
   const titleLH = titleSize * 1.26;
 
-  // 摘要：36px，最多 3 行，行距放宽，保证完整展示
-  const sumLines = summary ? wrapText(summary, 36, maxW, 3) : [];
-  const sumLH = 36 * 1.6;
+  // 摘要：自适应字号，最多 4 行——装不下自动缩小字号（36→26px），保证完整展示不出现省略号
+  const sumFit = summary ? fitLines(summary, [36, 32, 28, 26], maxW, 4) : null;
+  const sumLines = sumFit ? sumFit.lines : [];
+  const sumSize = sumFit ? sumFit.size : 36;
+  const sumLH = sumSize * 1.6;
 
   // 底部 meta 行高度
   const metaH = 130;
@@ -258,9 +260,9 @@ export function buildCoverSVG(options = {}) {
   }
 
   // 摘要
-  let sy = y + (fit.lines.length - 1) * titleLH + 34 + 36;
+  let sy = y + (fit.lines.length - 1) * titleLH + 34 + sumSize;
   for (const line of sumLines) {
-    parts.push(`<text x="${textX}" y="${Math.round(sy)}" font-family="${FONT}" font-size="36" fill="${theme.summary}">${esc(line)}</text>`);
+    parts.push(`<text x="${textX}" y="${Math.round(sy)}" font-family="${FONT}" font-size="${sumSize}" fill="${theme.summary}">${esc(line)}</text>`);
     sy += sumLH;
   }
 
