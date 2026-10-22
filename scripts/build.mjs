@@ -165,6 +165,7 @@ function renderSitemap(posts, pages) {
   const entries = [
     { loc: '/', lastmod: today, priority: '1.0' },
     { loc: '/archive.html', lastmod: today, priority: '0.5' },
+    { loc: '/cover.html', lastmod: today, priority: '0.5' },
     ...pages.map((p) => ({ loc: p.path, lastmod: today, priority: '0.5' })),
     ...Object.keys(site.categories).map((k) => ({ loc: `/category/${k}.html`, lastmod: today, priority: '0.6' })),
     ...posts.map((p) => ({ loc: `/posts/${p.slug}.html`, lastmod: p.date, priority: '0.8' })),
@@ -239,6 +240,9 @@ function build() {
 
   // 归档
   write('archive.html', T.renderArchive({ site, url, posts }));
+
+  // 公众号封面工具页（在线设计器，/cover.html）
+  write('cover.html', T.renderCoverTool({ site, url }));
 
   // 文章页
   posts.forEach((post, i) => {

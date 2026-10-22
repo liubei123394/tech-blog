@@ -28,6 +28,7 @@ export default {
     { key: 'bug', label: 'Bug 排查', href: '/category/bug.html' },
     { key: 'project', label: '实战项目', href: '/category/project.html' },
     { key: 'tools', label: '工具笔记', href: '/category/tools.html' },
+    { key: 'cover', label: '封面工具', href: '/cover.html' },
     { key: 'archive', label: '归档', href: '/archive.html' },
     { key: 'about', label: '关于', href: '/about.html' },
   ],

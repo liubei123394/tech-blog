@@ -37,7 +37,8 @@ npm run new -- "Vite 环境变量踩坑记录" bug
 ├── pages/                    # 独立页面，如 about.md → /about.html
 ├── src/assets/
 │   ├── style.css             # 全站样式
-│   └── main.js               # 主题切换、搜索、筛选、复制
+│   ├── main.js               # 主题切换、搜索、筛选、复制
+│   └── cover-tool.js         # 公众号封面设计器（/cover.html 页面逻辑）
 ├── scripts/
 │   ├── build.mjs             # 构建入口
 │   ├── serve.mjs             # 本地预览服务器（含文件监听）
@@ -47,8 +48,6 @@ npm run new -- "Vite 环境变量踩坑记录" bug
 │       ├── templates.mjs     # HTML 页面模板
 │       ├── cover-svg.mjs     # 公众号封面 SVG 模板（5 套，双端复用）
 │       └── cover.mjs         # 封面 SVG → PNG 光栅化 + 落盘
-├── tools/
-│   └── cover-designer.html   # 手动封面设计器（双击即用，可导出 PNG）
 ├── site.config.mjs           # 站点配置：名字、导航、分类、部署地址
 ├── .github/workflows/deploy.yml   # 推送到 main 自动部署到 GitHub Pages
 └── dist/                     # 构建产物（已 gitignore）
@@ -146,7 +145,7 @@ git add -A && git commit -m "docs: 新增 xxx 笔记" && git push
 
 - **模板**：内置 5 套（极光 / 薄荷 / 落日 / 纸墨 / 终端），`template: "auto"` 时按文章 slug 恒定挑选；在 `wx.config.json` 里加 `"coverTemplate": "aurora"`、`"coverAccent": "#22d3ee"`、`"brand": "DevNotes"` 可自定义，`"cover": false` 整体关闭。
 - **缓存**：文章未改动时封面不重复生成，素材 media_id 按图片内容哈希缓存。
-- **手动设计器**：直接双击打开 `tools/cover-designer.html`，改标题/摘要/标签/配色、换模板，一键导出 PNG（1800×766）；也支持 `?title=标题&summary=摘要&tags=a,b` 参数预填。
+- **在线设计器**：博客导航「封面工具」→ `/cover.html`（站点内路由页，跟随主题切换）。选文章快速填充或手动改标题/摘要/标签/配色、换模板，一键导出 PNG（1800×766）；也支持 `?title=标题&summary=摘要&tags=a,b` 参数预填。自动封面流程用的模板与它完全同款（`scripts/lib/cover-svg.mjs` 与 `src/assets/cover-tool.js` 是同一份实现的两处副本，改动需同步）。
 - **开关**：`npm run sync -- --no-cover` 跳过自动封面（回退默认头像）。
 - **依赖**：光栅化用 `@resvg/resvg-js`（已加入 optionalDependencies，中文渲染可靠）；都没装时只产出 SVG，推送自动回退默认封面。
 
