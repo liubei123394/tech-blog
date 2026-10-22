@@ -223,12 +223,12 @@ export function buildCoverSVG(options = {}) {
   const titleSize = fit.size;
   const titleLH = titleSize * 1.26;
 
-  // 摘要：36px，最多 2 行
-  const sumLines = summary ? wrapText(summary, 36, maxW, 2) : [];
-  const sumLH = 36 * 1.55;
+  // 摘要：36px，最多 3 行，行距放宽，保证完整展示
+  const sumLines = summary ? wrapText(summary, 36, maxW, 3) : [];
+  const sumLH = 36 * 1.6;
 
   // 底部 meta 行高度
-  const metaH = 120;
+  const metaH = 130;
   const blockH = fit.lines.length * titleLH + (sumLines.length ? 34 + sumLines.length * sumLH : 0);
   let y = Math.round((COVER_H - metaH - blockH) / 2 + titleSize); // 第一行标题基线
   y = Math.max(y, titleSize + 20);

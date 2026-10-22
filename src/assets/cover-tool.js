@@ -3,6 +3,8 @@
  * ------------------------------------------------------------------
  * 由 scripts/lib/templates.mjs 的 renderCoverTool() 引入，
  * 在 #cover-tool-root 里注入控件与实时预览，一键导出 PNG（1800×766）。
+ * 样式全部使用站点设计令牌（style.css 的 --text/--border/--accent 等），
+ * 自动跟随明暗主题。
  *
  * ⚠️ 内嵌的封面模板渲染逻辑与 scripts/lib/cover-svg.mjs
  *    （npm run sync 自动封面用的是它）是同一份实现的副本，
@@ -170,9 +172,10 @@
     var accentColor = accent || theme.accent;
     var fit = fitLines(title, [104, 92, 80, 70, 62], maxW, 2);
     var titleSize = fit.size, titleLH = titleSize * 1.26;
-    var sumLines = summary ? wrapText(summary, 36, maxW, 2) : [];
-    var sumLH = 36 * 1.55;
-    var metaH = 120;
+    // 摘要最多 3 行，行距放宽，保证完整展示
+    var sumLines = summary ? wrapText(summary, 36, maxW, 3) : [];
+    var sumLH = 36 * 1.6;
+    var metaH = 130;
     var blockH = fit.lines.length * titleLH + (sumLines.length ? 34 + sumLines.length * sumLH : 0);
     var y = Math.round((COVER_H - metaH - blockH) / 2 + titleSize);
     y = Math.max(y, titleSize + 20);
@@ -224,35 +227,38 @@
 
   var TPL_LABELS = { aurora: '极光', mint: '薄荷', sunset: '落日', ink: '纸墨', code: '终端' };
   var STYLE = [
-    '.cover-tool { display: grid; grid-template-columns: minmax(300px, 380px) 1fr; gap: 24px; align-items: start; }',
+    '.cover-tool { display: grid; grid-template-columns: minmax(300px, 400px) 1fr; gap: 28px; align-items: start; }',
     '@media (max-width: 900px) { .cover-tool { grid-template-columns: 1fr; } }',
-    '.ct-panel { background: var(--card, #fff); border: 1px solid var(--line, #e2e8f0); border-radius: 12px; padding: 20px; }',
-    '.ct-panel label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 6px; color: var(--text, inherit); }',
-    '.ct-panel label:first-child { margin-top: 0; }',
-    '.ct-panel label small { font-weight: 400; color: var(--muted, #64748b); }',
+    '.ct-panel { background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; }',
+    '.ct-group + .ct-group { margin-top: 22px; padding-top: 18px; border-top: 1px dashed var(--border); }',
+    '.ct-group-title { font-size: 12px; font-weight: 700; letter-spacing: .12em; color: var(--text-3); margin: 0 0 12px; }',
+    '.ct-panel label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 6px; color: var(--text-2); }',
+    '.ct-group label:first-of-type { margin-top: 0; }',
+    '.ct-panel label small { font-weight: 400; color: var(--text-3); }',
     '.ct-panel input[type="text"], .ct-panel textarea, .ct-panel select {',
-    '  width: 100%; padding: 9px 12px; border: 1px solid var(--line, #e2e8f0); border-radius: 8px;',
-    '  font-size: 14px; font-family: inherit; background: var(--bg-soft, #f8fafc); color: var(--text, inherit); box-sizing: border-box;',
+    '  width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);',
+    '  font-size: 14px; font-family: inherit; background: var(--bg-soft); color: var(--text); box-sizing: border-box; transition: border-color .15s, box-shadow .15s;',
     '}',
-    '.ct-panel textarea { resize: vertical; min-height: 64px; line-height: 1.6; }',
-    '.ct-panel input:focus, .ct-panel textarea:focus, .ct-panel select:focus { outline: 2px solid rgba(47,111,237,.35); border-color: #2f6fed; }',
+    '.ct-panel textarea { resize: vertical; min-height: 72px; line-height: 1.6; }',
+    '.ct-panel input:focus, .ct-panel textarea:focus, .ct-panel select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }',
     '.ct-row { display: flex; gap: 10px; }',
-    '.ct-row > * { flex: 1; min-width: 0; }',
+    '.ct-row > div { flex: 1; min-width: 0; }',
     '.ct-color-row { display: flex; align-items: center; gap: 10px; }',
-    '.ct-color-row input[type="color"] { width: 46px; height: 38px; padding: 2px; border: 1px solid var(--line, #e2e8f0); border-radius: 8px; background: transparent; cursor: pointer; }',
-    '.ct-color-row .ct-hint { font-size: 12px; color: var(--muted, #64748b); }',
-    '.ct-btns { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }',
-    '.ct-btns button { padding: 10px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }',
-    '#ct-dl-png { background: #2f6fed; color: #fff; }',
-    '#ct-dl-svg { background: #059669; color: #fff; }',
-    '#ct-reroll { background: rgba(47,111,237,.1); color: #2f6fed; }',
-    '.ct-preview-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 13px; color: var(--muted, #64748b); }',
-    '.ct-preview-meta b { color: var(--text, inherit); }',
-    '.ct-preview-frame { border: 1px solid var(--line, #e2e8f0); border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 2px 10px rgba(15,23,42,.06); }',
+    '.ct-color-row input[type="color"] { width: 46px; height: 38px; padding: 2px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: transparent; cursor: pointer; }',
+    '.ct-color-row .ct-hint { font-size: 12px; color: var(--text-3); }',
+    '.ct-btns { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }',
+    '.ct-btns .btn { flex: 1 1 auto; justify-content: center; text-align: center; }',
+    '.ct-btn-svg { background: var(--bg-soft) !important; }',
+    '.ct-tips { margin: 12px 0 0; font-size: 12.5px; color: var(--text-3); line-height: 1.8; }',
+    '.ct-tips code { padding: 1px 6px; border-radius: 6px; background: var(--code-bg); border: 1px solid var(--code-border); font-size: 12px; }',
+    '#ct-tip { color: #17864a; font-weight: 600; }',
+    '[data-theme="dark"] #ct-tip { color: #6ee7a4; }',
+    '.ct-preview-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 13px; color: var(--text-3); }',
+    '.ct-preview-meta b { color: var(--text); }',
+    '.ct-preview-sticky { position: sticky; top: 84px; }',
+    '@media (max-width: 900px) { .ct-preview-sticky { position: static; } }',
+    '.ct-preview-frame { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--bg-elev); box-shadow: var(--shadow-lift); }',
     '.ct-preview-frame svg { display: block; width: 100%; height: auto; }',
-    '.ct-tips { margin-top: 12px; font-size: 12.5px; color: var(--muted, #64748b); line-height: 1.8; }',
-    '#ct-tip { color: #059669; font-weight: 600; }',
-    '[data-theme="dark"] .ct-preview-frame { background: #0f172a; }',
   ].join('\n');
 
   function el(tag, attrs, html) {
@@ -270,52 +276,52 @@
     style.textContent = STYLE;
     document.head.appendChild(style);
 
-    // 取脚本上的 data-base（含部署子路径前缀），供拉取 search-index.json
-    var script = document.currentScript || document.querySelector('script[data-base]');
-    var base = (script && script.getAttribute('data-base')) || '/';
-
     root.innerHTML =
       '<div class="cover-tool">' +
       '  <div>' +
       '    <div class="ct-panel">' +
-      '      <label>从博客文章导入 <small>（自动填充标题/摘要/标签/日期）</small></label>' +
-      '      <select id="ct-post-pick"><option value="">— 选择一篇已发布文章 —</option></select>' +
-      '      <label>文章标题 <small>（超长自动换行/缩放）</small></label>' +
-      '      <textarea id="ct-title">用零依赖 Node 脚本把 Markdown 编译成静态博客</textarea>' +
-      '      <label>摘要 <small>（选填，最多两行）</small></label>' +
-      '      <textarea id="ct-summary">不依赖任何框架，200 行代码搞定构建、RSS 与 SEO。</textarea>' +
-      '      <label>标签 <small>（英文逗号分隔，最多 3 个）</small></label>' +
-      '      <input type="text" id="ct-tags" value="Node, 静态博客">' +
-      '      <div class="ct-row">' +
-      '        <div><label>日期</label><input type="text" id="ct-date" value=""></div>' +
-      '        <div><label>品牌名 / 站点名</label><input type="text" id="ct-brand" value="DevNotes"></div>' +
+      '      <div class="ct-group">' +
+      '        <p class="ct-group-title">内容</p>' +
+      '        <label>文章标题 <small>（超长自动换行/缩放）</small></label>' +
+      '        <textarea id="ct-title">用零依赖 Node 脚本把 Markdown 编译成静态博客</textarea>' +
+      '        <label>摘要 <small>（选填，最多三行）</small></label>' +
+      '        <textarea id="ct-summary">不依赖任何框架，200 行代码搞定构建、RSS 与 SEO，记录一次完整的造轮子过程。</textarea>' +
+      '        <label>标签 <small>（英文逗号分隔，最多 3 个）</small></label>' +
+      '        <input type="text" id="ct-tags" value="Node, 静态博客">' +
+      '        <div class="ct-row">' +
+      '          <div><label>日期</label><input type="text" id="ct-date" value=""></div>' +
+      '          <div><label>品牌名 / 站点名</label><input type="text" id="ct-brand" value="DevNotes"></div>' +
+      '        </div>' +
       '      </div>' +
-      '      <label>封面模板</label>' +
-      '      <select id="ct-template">' +
-      '        <option value="auto">自动（按内容挑选，同一篇恒定）</option>' +
-      '        <option value="aurora">极光（深蓝紫渐变）</option>' +
-      '        <option value="mint">薄荷（清新浅绿）</option>' +
-      '        <option value="sunset">落日（橙粉渐变）</option>' +
-      '        <option value="ink">纸墨（极简白）</option>' +
-      '        <option value="code">终端（深色代码风）</option>' +
-      '      </select>' +
-      '      <label>主题色 <small>（选填，覆盖模板默认点缀色）</small></label>' +
-      '      <div class="ct-color-row">' +
-      '        <input type="color" id="ct-accent" value="#22d3ee">' +
-      '        <span class="ct-hint">不动则使用各模板默认配色</span>' +
+      '      <div class="ct-group">' +
+      '        <p class="ct-group-title">样式</p>' +
+      '        <label>封面模板</label>' +
+      '        <select id="ct-template">' +
+      '          <option value="auto">自动（按内容挑选，同一篇恒定）</option>' +
+      '          <option value="aurora">极光（深蓝紫渐变）</option>' +
+      '          <option value="mint">薄荷（清新浅绿）</option>' +
+      '          <option value="sunset">落日（橙粉渐变）</option>' +
+      '          <option value="ink">纸墨（极简白）</option>' +
+      '          <option value="code">终端（深色代码风）</option>' +
+      '        </select>' +
+      '        <label>主题色 <small>（选填，覆盖模板默认点缀色）</small></label>' +
+      '        <div class="ct-color-row">' +
+      '          <input type="color" id="ct-accent" value="#22d3ee">' +
+      '          <span class="ct-hint">不动则使用各模板默认配色</span>' +
+      '        </div>' +
       '      </div>' +
       '      <div class="ct-btns">' +
-      '        <button type="button" id="ct-dl-png">⬇️ 导出 PNG（1800×766）</button>' +
-      '        <button type="button" id="ct-dl-svg">导出 SVG</button>' +
-      '        <button type="button" id="ct-reroll">🎲 换一批花样</button>' +
+      '        <button type="button" class="btn btn-primary" id="ct-dl-png">⬇️ 导出 PNG（1800×766）</button>' +
+      '        <button type="button" class="btn ct-btn-svg" id="ct-dl-svg">导出 SVG</button>' +
+      '        <button type="button" class="btn" id="ct-reroll">🎲 换一批</button>' +
       '      </div>' +
       '      <p class="ct-tips" id="ct-tip"></p>' +
       '    </div>' +
       '  </div>' +
-      '  <div>' +
+      '  <div class="ct-preview-sticky">' +
       '    <div class="ct-preview-meta"><span>实时预览 · <b id="ct-tpl-name">—</b></span><span>1800 × 766（2.35:1）</span></div>' +
       '    <div class="ct-preview-frame" id="ct-preview"></div>' +
-      '    <p class="ct-tips">导出后可到公众号后台「封面」处手动上传；写完文章后运行 <code>npm run sync</code>，脚本会按同样的模板自动生成封面并绑定到草稿箱，无需手动操作。</p>' +
+      '    <p class="ct-tips">写完文章推送到 GitHub，流水线会按同样的模板自动生成封面并同步公众号草稿；也可以在这里手动导出 PNG，到公众号后台「封面」处上传。</p>' +
       '  </div>' +
       '</div>';
 
@@ -376,28 +382,6 @@
       $(id).addEventListener('input', render);
       $(id).addEventListener('change', render);
     });
-
-    // 从博客文章导入（构建产物 search-index.json）
-    fetch(base.replace(/\/?$/, '/') + 'search-index.json')
-      .then(function (r) { return r.ok ? r.json() : []; })
-      .then(function (posts) {
-        if (!posts || !posts.length) return;
-        var sel = $('ct-post-pick');
-        posts.forEach(function (p, i) {
-          var opt = el('option', { value: String(i) }, esc(p.title));
-          sel.appendChild(opt);
-        });
-        sel.addEventListener('change', function () {
-          var p = posts[Number(sel.value)];
-          if (!p) return;
-          $('ct-title').value = p.title || '';
-          $('ct-summary').value = p.summary || '';
-          $('ct-tags').value = (p.tags || []).join(', ');
-          $('ct-date').value = p.date || '';
-          render();
-        });
-      })
-      .catch(function () { /* 拉取失败不影响手动使用 */ });
 
     // 支持 ?title=&summary=&tags=&date=&brand=&template=&accent= 预填
     var q = new URLSearchParams(location.search);

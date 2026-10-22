@@ -145,7 +145,8 @@ git add -A && git commit -m "docs: 新增 xxx 笔记" && git push
 
 - **模板**：内置 5 套（极光 / 薄荷 / 落日 / 纸墨 / 终端），`template: "auto"` 时按文章 slug 恒定挑选；在 `wx.config.json` 里加 `"coverTemplate": "aurora"`、`"coverAccent": "#22d3ee"`、`"brand": "DevNotes"` 可自定义，`"cover": false` 整体关闭。
 - **缓存**：文章未改动时封面不重复生成，素材 media_id 按图片内容哈希缓存。
-- **在线设计器**：博客导航「封面工具」→ `/cover.html`（站点内路由页，跟随主题切换）。选文章快速填充或手动改标题/摘要/标签/配色、换模板，一键导出 PNG（1800×766）；也支持 `?title=标题&summary=摘要&tags=a,b` 参数预填。自动封面流程用的模板与它完全同款（`scripts/lib/cover-svg.mjs` 与 `src/assets/cover-tool.js` 是同一份实现的两处副本，改动需同步）。
+- **在线设计器**：博客导航「封面工具」→ `/cover.html`（站点内路由页，跟随主题切换）。手动改标题/摘要/标签/配色、换模板，一键导出 PNG（1800×766）；也支持 `?title=标题&summary=摘要&tags=a,b` 参数预填。自动封面流程用的模板与它完全同款（`scripts/lib/cover-svg.mjs` 与 `src/assets/cover-tool.js` 是同一份实现的两处副本，改动需同步）。
+- **自动流水线**：`.github/workflows/sync.yml`——推 `posts/**` 到 GitHub 后自动运行 `npm run sync`：生成 HTML 与封面产物（Actions Artifacts 可下载），配置了仓库 Secrets `WX_APPID`/`WX_SECRET` 时自动推送草稿箱。注意微信要求 IP 白名单，云端 runner 出口 IP 不固定，大概率 40164 回退；想全自动推草稿，在本机常驻 self-hosted runner 并把 workflow 的 `runs-on` 切为 `self-hosted`。
 - **开关**：`npm run sync -- --no-cover` 跳过自动封面（回退默认头像）。
 - **依赖**：光栅化用 `@resvg/resvg-js`（已加入 optionalDependencies，中文渲染可靠）；都没装时只产出 SVG，推送自动回退默认封面。
 

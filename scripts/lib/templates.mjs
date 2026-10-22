@@ -382,7 +382,7 @@ export function renderCoverTool({ site, url }) {
   const content = `<section class="wrap page-head">
   <nav class="crumb"><a href="${url('/')}">首页</a><span>/</span><span>公众号封面工具</span></nav>
   <h1 class="page-title">公众号封面设计器</h1>
-  <p class="page-desc">内置 2.35:1（1800×766）公众号头条封面模板，与 <code>npm run sync</code> 的自动封面同款。选文章快速填充或直接输入标题摘要，实时预览，一键导出 PNG。也支持 <code>?title=标题&amp;summary=摘要&amp;tags=a,b</code> 参数预填。</p>
+  <p class="page-desc">内置 2.35:1（1800×766）公众号头条封面模板，与 <code>npm run sync</code> 的自动封面同款。输入标题与摘要，实时预览，一键导出 PNG。也支持 <code>?title=标题&amp;summary=摘要&amp;tags=a,b</code> 参数预填。</p>
 </section>
 <section class="wrap section" id="cover-tool-root"></section>
 <script src="${url('/assets/cover-tool.js')}" data-base="${h(url(''))}" defer></script>`;

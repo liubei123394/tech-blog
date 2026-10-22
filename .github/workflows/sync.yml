@@ -1,0 +1,63 @@
+# 公众号同步流水线：posts/ 有新文章推送后自动执行
+# ------------------------------------------------------------------
+# 运行 scripts/sync-wx.mjs（与本地 npm run sync 完全同一入口）：
+#   · 永远执行：生成公众号 HTML（wx-html/）与自动封面（wx-covers/），上传为构建产物
+#   · 尝试推送草稿箱：在仓库 Settings → Secrets and variables → Actions
+#     配置 WX_APPID / WX_SECRET（与本地 wx.config.json 同一套凭据）后自动生效；
+#     未配置时脚本自动跳过 API 推送，只出产物，不会报错。
+#
+# ⚠️ 已知限制：微信服务端要求 IP 白名单，GitHub 托管 runner 的出口 IP 不固定，
+#    大概率返回 40164 中止推送（脚本优雅回退，不影响产物生成）。
+#    想让云端全自动推草稿成功：在本机常驻一个 self-hosted runner，
+#    并把本机出口 IP 加入公众号白名单，然后把下面 runs-on 切换为 self-hosted。
+name: Sync WeChat Drafts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'posts/**'
+      - 'scripts/**'
+  workflow_dispatch: {} # 支持在 Actions 页手动触发
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    # runs-on: [self-hosted]  # 全自动推草稿箱：本机装 runner 后切换到这里
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 安装依赖（封面光栅化 @resvg/resvg-js）
+        run: npm ci --no-fund --no-audit || npm install --no-fund --no-audit
+
+      # 与本地 npm run sync 同一入口：生成 HTML + 自动封面，凭据存在时推送草稿箱
+      - name: 同步公众号（HTML + 封面 + 草稿箱）
+        run: node scripts/sync-wx.mjs
+        env:
+          WX_APPID: ${{ secrets.WX_APPID }}
+          WX_SECRET: ${{ secrets.WX_SECRET }}
+
+      - name: 上传自动封面产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: wx-covers
+          path: wx-covers/*.png
+          if-no-files-found: ignore
+          retention-days: 90
+
+      - name: 上传公众号 HTML 产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: wx-html
+          path: wx-html/
+          if-no-files-found: ignore
+          retention-days: 90
