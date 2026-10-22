@@ -44,7 +44,11 @@ npm run new -- "Vite 环境变量踩坑记录" bug
 │   ├── new-post.mjs          # 新建文章脚手架
 │   └── lib/
 │       ├── markdown.mjs      # Markdown 渲染器（含公众号内联样式模式）
-│       └── templates.mjs     # HTML 页面模板
+│       ├── templates.mjs     # HTML 页面模板
+│       ├── cover-svg.mjs     # 公众号封面 SVG 模板（5 套，双端复用）
+│       └── cover.mjs         # 封面 SVG → PNG 光栅化 + 落盘
+├── tools/
+│   └── cover-designer.html   # 手动封面设计器（双击即用，可导出 PNG）
 ├── site.config.mjs           # 站点配置：名字、导航、分类、部署地址
 ├── .github/workflows/deploy.yml   # 推送到 main 自动部署到 GitHub Pages
 └── dist/                     # 构建产物（已 gitignore）
@@ -129,6 +133,22 @@ git add -A && git commit -m "docs: 新增 xxx 笔记" && git push
 因为公众号编辑器会过滤掉 `class` 和 `<style>` 标签，只保留内联样式，所以必须渲染两份。
 
 要调整公众号里代码块、引用的配色，改 `markdown.mjs` 里的 `WX_BLOCK` 和 `WX_INLINE` 两张表即可。
+
+---
+
+## 自动封面生成
+
+`npm run sync` 会为每篇文章自动生成一张 **2.35:1**（1800×766）的公众号头条封面，并作为草稿封面推送到草稿箱，替代默认头像封面：
+
+1. 读取文章 frontmatter 的 `title` / `summary` / `tags` / `date`（缺 summary 时自动截取正文）；
+2. 按模板渲染 SVG → 光栅化为 PNG，存到 `wx-covers/<slug>.png`（+SVG 源文件）；
+3. 推送草稿时上传为永久素材（`material/add_material`）并绑定 `thumb_media_id`。
+
+- **模板**：内置 5 套（极光 / 薄荷 / 落日 / 纸墨 / 终端），`template: "auto"` 时按文章 slug 恒定挑选；在 `wx.config.json` 里加 `"coverTemplate": "aurora"`、`"coverAccent": "#22d3ee"`、`"brand": "DevNotes"` 可自定义，`"cover": false` 整体关闭。
+- **缓存**：文章未改动时封面不重复生成，素材 media_id 按图片内容哈希缓存。
+- **手动设计器**：直接双击打开 `tools/cover-designer.html`，改标题/摘要/标签/配色、换模板，一键导出 PNG（1800×766）；也支持 `?title=标题&summary=摘要&tags=a,b` 参数预填。
+- **开关**：`npm run sync -- --no-cover` 跳过自动封面（回退默认头像）。
+- **依赖**：光栅化用 `@resvg/resvg-js`（已加入 optionalDependencies，中文渲染可靠）；都没装时只产出 SVG，推送自动回退默认封面。
 
 ---
 

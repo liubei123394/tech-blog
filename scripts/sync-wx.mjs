@@ -13,6 +13,12 @@
  *   node scripts/sync-wx.mjs              全流程（未配置凭据则只生成本地 HTML）
  *   node scripts/sync-wx.mjs --html-only  只生成本地 HTML，不碰 API
  *   node scripts/sync-wx.mjs --reset      清空同步记录（下次全部重推/重生成）
+ *   node scripts/sync-wx.mjs --no-cover   跳过自动封面（生成与绑定都不生效）
+ *
+ * 自动封面（第 1.5 层）：每篇文章按标题/摘要/标签渲染 2.35:1 封面
+ *   → wx-covers/<slug>.png（+SVG，模板见 scripts/lib/cover-svg.mjs，
+ *     手动自定义工具：tools/cover-designer.html），推送草稿时优先
+ *   用它作 thumb_media_id；文章未变则复用缓存，缺光栅化依赖时回退 defaultThumb。
  *
  * 配置：博客根目录 wx.config.json（已被 .gitignore 忽略）：
  *   {
@@ -34,6 +40,7 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 import { parseFrontmatter, parseBlocks, renderBlocks, blocksToText, readingTime } from './lib/markdown.mjs';
+import { generateCoverFiles } from './lib/cover.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -41,12 +48,14 @@ const POSTS_DIR = path.join(ROOT, 'posts');
 const OUT_DIR = path.join(ROOT, 'wx-html');
 const STATE_FILE = path.join(ROOT, '.wx-sync.json');
 const CONFIG_FILE = path.join(ROOT, 'wx.config.json');
+const COVER_DIR = path.join(ROOT, 'wx-covers'); // 自动生成的文章封面（PNG+SVG）
 
 const API = 'https://api.weixin.qq.com/cgi-bin';
 const log = (...a) => console.log(...a);
 
 const args = new Set(process.argv.slice(2));
 const HTML_ONLY = args.has('--html-only');
+const NO_COVER = args.has('--no-cover'); // 跳过自动封面（生成与绑定都不生效）
 
 /* ------------------------------- 固定尾注 ------------------------------- */
 
@@ -95,6 +104,12 @@ function loadConfig() {
   cfg.secret = process.env.WX_SECRET || cfg.secret || '';
   cfg.author = cfg.author || '双非小文学AI';
   cfg.defaultThumb = cfg.defaultThumb || 'src/assets/avatar.png';
+  // 封面生成配置（可选）：brand 品牌名 / coverTemplate 模板（auto|aurora|mint|sunset|ink|code）
+  // / coverAccent 主题色（如 '#22d3ee'）/ cover: false 可整体关闭自动封面
+  cfg.brand = cfg.brand || 'DevNotes';
+  cfg.coverTemplate = cfg.coverTemplate || 'auto';
+  cfg.coverAccent = cfg.coverAccent || '';
+  cfg.cover = cfg.cover !== false;
   return cfg;
 }
 
@@ -311,11 +326,18 @@ async function pushDraft(cfg, p, state) {
     log(`   ↳ 正文图片已上传: ${path.basename(img.absPath)}`);
   }
 
-  // 2. 封面：优先配置的 defaultThumb，其次正文首图（必须永久素材）
+  // 2. 封面：优先自动生成的文章封面（wx-covers/）→ 配置的 defaultThumb → 正文首图（必须永久素材）
   const firstLocal = findLocalImages(p.wxHtml)[0];
-  const coverPath = cfg.defaultThumb
-    ? path.join(ROOT, cfg.defaultThumb)
-    : firstLocal?.absPath;
+  let coverPath;
+  const autoCover = path.join(COVER_DIR, `${p.slug}.png`);
+  if (!NO_COVER && fs.existsSync(autoCover)) {
+    coverPath = autoCover;
+    log(`   ↳ 使用自动生成封面: wx-covers/${p.slug}.png`);
+  } else if (cfg.defaultThumb) {
+    coverPath = path.join(ROOT, cfg.defaultThumb);
+  } else {
+    coverPath = firstLocal?.absPath;
+  }
   if (!coverPath || !fs.existsSync(coverPath)) {
     throw new Error('没有可用封面图（配置 defaultThumb 或在正文放一张本地图片）');
   }
@@ -378,8 +400,38 @@ async function main() {
   }
   log(`\n✅ 本地 HTML 已生成 ${posts.length} 篇 → wx-html/`);
   if (added.length) log(`   🆕 新增：${added.join(', ')}`);
-  if (updated.length) log(`   ✏️  更新：${updated.join(', ')}`);
+  if (updated.length) log(`   ✏️  更新：${updated.length} 篇`);
   if (!added.length && !updated.length) log('   · 无新增/更新');
+
+  /* ---- 第 1.5 层：自动封面（可选，任何失败都不影响主流程） ---- */
+  if (NO_COVER) {
+    log('🚫 --no-cover：跳过自动封面，推送时将使用默认封面');
+  } else if (cfg.cover) {
+    let noSharp = false;
+    let coverMade = 0;
+    for (const p of posts) {
+      const rec = state.posts[p.file] || {};
+      const pngPath = path.join(COVER_DIR, `${p.slug}.png`);
+      if (rec.coverHash && rec.coverHash === rec.hash && fs.existsSync(pngPath)) continue; // 文章未变且封面已生成
+      try {
+        const r = await generateCoverFiles(p, {
+          coverDir: COVER_DIR,
+          brand: cfg.brand,
+          template: cfg.coverTemplate,
+          accent: cfg.coverAccent,
+        });
+        if (!r.pngPath) { noSharp = true; break; }
+        state.posts[p.file] = { ...rec, coverHash: rec.hash, coverTemplate: r.template };
+        coverMade++;
+        log(`   🖼 封面: wx-covers/${p.slug}.png（模板 ${r.template}）`);
+      } catch (e) {
+        log(`   ⚠️ 封面生成失败（不影响同步）: ${p.slug} —— ${e.message}`);
+      }
+    }
+    if (coverMade) log(`✅ 自动封面已生成/更新 ${coverMade} 张 → wx-covers/`);
+    if (noSharp) log('⚠️  未安装 @resvg/resvg-js（npm i @resvg/resvg-js），只产出 SVG；推送草稿将回退默认头像封面');
+    saveState(state);
+  }
 
   /* ---- 第 2 层：API 推送（可选） ---- */
   if (HTML_ONLY || !canPush) {

@@ -9,10 +9,11 @@ node_modules/
 .env.*
 !.env.example
 
-# 公众号同步（wx.config.json 含 AppSecret，严禁提交；wx-html/ 为生成产物）
+# 公众号同步（wx.config.json 含 AppSecret，严禁提交；wx-html/ 与 wx-covers/ 为生成产物）
 wx.config.json
 .wx-sync.json
 wx-html/
+wx-covers/
 
 # 编辑器与系统
 .vscode/*
