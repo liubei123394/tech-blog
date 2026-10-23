@@ -242,6 +242,7 @@
     '  font-size: 14px; font-family: inherit; background: var(--bg-soft); color: var(--text); box-sizing: border-box; transition: border-color .15s, box-shadow .15s;',
     '}',
     '.ct-panel textarea { resize: vertical; min-height: 72px; line-height: 1.6; }',
+    '.ct-panel #ct-summary { min-height: 180px; max-height: 320px; overflow-y: auto; }',
     '.ct-panel input:focus, .ct-panel textarea:focus, .ct-panel select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }',
     '.ct-row { display: flex; gap: 10px; }',
     '.ct-row > div { flex: 1; min-width: 0; }',
