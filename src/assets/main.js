@@ -84,16 +84,6 @@
 
   /* ------------------------------ 复制工具 ------------------------------ */
 
-  function copyRich(html, text) {
-    if (navigator.clipboard && window.ClipboardItem) {
-      return navigator.clipboard.write([new ClipboardItem({
-        'text/html': new Blob([html], { type: 'text/html' }),
-        'text/plain': new Blob([text], { type: 'text/plain' })
-      })]).then(function () { return true; }).catch(function () { return copyLegacy(html); });
-    }
-    return Promise.resolve(copyLegacy(html));
-  }
-
   function copyLegacy(html) {
     try {
       var box = document.createElement('div');
@@ -121,37 +111,6 @@
     btn.textContent = text;
     btn.classList.add('done');
     setTimeout(function () { btn.textContent = old; btn.classList.remove('done'); }, 1800);
-  }
-
-  // 复制到公众号：复制带内联样式的富文本，粘贴进公众号编辑器可保留排版
-  var wxBtn = $('[data-copy-wechat]');
-  if (wxBtn) {
-    wxBtn.addEventListener('click', function () {
-      var src = $('#wechat-source');
-      var body = $('#post-body');
-      if (!src) return;
-      var title = ($('.post-title') || {}).textContent || document.title;
-      var html = '<h1 style="margin:0 0 16px;font-size:22px;line-height:1.45;font-weight:700;color:#111111;">'
-        + esc(title) + '</h1>' + src.innerHTML.trim();
-      copyRich(html, body ? body.innerText : src.innerText).then(function (ok) {
-        flash(wxBtn, ok ? '✓ 已复制，去公众号粘贴' : '复制失败，请手动选中');
-      });
-    });
-  }
-
-  var linkBtn = $('[data-copy-link]');
-  if (linkBtn) {
-    linkBtn.addEventListener('click', function () {
-      var url = window.location.href;
-      var done = function () { flash(linkBtn, '✓ 链接已复制'); };
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(url).then(done).catch(function () {
-          copyLegacy(esc(url)) && done();
-        });
-      } else {
-        copyLegacy(esc(url)) && done();
-      }
-    });
   }
 
   // 代码块复制

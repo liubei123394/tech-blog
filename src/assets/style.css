@@ -392,8 +392,6 @@ a:hover { color: var(--accent); }
 .post-meta .dot { color: var(--border-strong); }
 .post-tags { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 14px; }
 
-.post-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 20px 0 0; }
-
 .btn {
   display: inline-flex; align-items: center; gap: 6px;
   font-family: var(--font); font-size: 13.5px;
@@ -406,14 +404,6 @@ a:hover { color: var(--accent); }
 .btn-primary:hover { background: var(--accent-text); border-color: var(--accent-text); color: #fff; }
 .btn.done { color: #17864a; border-color: #a8ddc0; background: #f0fbf5; }
 [data-theme="dark"] .btn.done { color: #6ee7a4; border-color: #2a5a41; background: #14261d; }
-
-.wechat-tip {
-  margin: 14px 0 0; padding: 13px 16px;
-  background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
-  border-radius: var(--radius-sm); font-size: 13.5px; color: var(--text-2); line-height: 1.7;
-}
-.wechat-tip strong { display: block; color: var(--accent-text); font-size: 13.5px; margin-bottom: 3px; }
-.wechat-tip p { margin: 0; }
 
 /* ------------------------------ 正文排版 ------------------------------ */
 
@@ -686,7 +676,7 @@ a:hover { color: var(--accent); }
 }
 
 @media print {
-  .site-header, .site-footer, .post-actions, .wechat-tip, .toc, .toc-fab, .toc-modal, .to-top, .post-nav { display: none !important; }
+  .site-header, .site-footer, .toc, .toc-fab, .toc-modal, .to-top, .post-nav { display: none !important; }
   .post-layout { grid-template-columns: 1fr; padding: 0; }
   body { font-size: 12pt; }
 }

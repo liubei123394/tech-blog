@@ -295,11 +295,6 @@ export function renderPost({ site, url, post, prev, next }) {
   </aside>`
     : '';
 
-  const editUrl = site.repo ? `${site.repo.replace(/\/+$/, '')}/edit/${site.repoBranch || 'main'}/posts/${post.file}` : '';
-  const wechatNote = site.wechat && site.wechat.name
-    ? `<div class="wechat-tip"><strong>同步到公众号</strong><p>点击下方按钮复制带排版的正文，粘贴进公众号编辑器即可保留标题、代码块、引用等样式。</p></div>`
-    : '';
-
   const navLinks = (prev || next)
     ? `<nav class="post-nav">
     ${prev ? `<a class="post-nav-item prev" href="${url(`/posts/${prev.slug}.html`)}"><span>上一篇</span><strong>${h(prev.title)}</strong></a>` : '<span></span>'}
@@ -321,19 +316,8 @@ export function renderPost({ site, url, post, prev, next }) {
       ${tags ? `<div class="post-tags">${tags}</div>` : ''}
     </header>
 
-    <div class="post-actions">
-      ${site.wechat && site.wechat.name ? '<button class="btn btn-primary" type="button" data-copy-wechat>复制到公众号</button>' : ''}
-      <button class="btn" type="button" data-copy-link>复制链接</button>
-      ${editUrl ? `<a class="btn" href="${h(editUrl)}" target="_blank" rel="noopener">编辑此页</a>` : ''}
-    </div>
-    ${wechatNote}
-
     <div class="post-body" id="post-body">
 ${post.html}
-    </div>
-
-    <div id="wechat-source" hidden>
-${post.wxHtml}
     </div>
 
     ${navLinks}
