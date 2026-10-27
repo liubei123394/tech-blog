@@ -12,6 +12,7 @@ node_modules/
 # 公众号同步（wx.config.json 含 AppSecret，严禁提交；wx-html/ 与 wx-covers/ 为生成产物）
 wx.config.json
 .wx-sync.json
+.wx-cache/
 wx-html/
 wx-covers/
 

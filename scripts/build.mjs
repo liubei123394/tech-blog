@@ -16,6 +16,7 @@ const ROOT = path.resolve(__dirname, '..');
 const POSTS_DIR = path.join(ROOT, 'posts');
 const PAGES_DIR = path.join(ROOT, 'pages');
 const ASSETS_DIR = path.join(ROOT, 'src', 'assets');
+const GALLERIES_DIR = path.join(ROOT, 'galleries');
 const OUT = path.join(ROOT, 'dist');
 
 const url = T.makeUrl(site.base);
@@ -35,13 +36,14 @@ function write(rel, content) {
   return file;
 }
 
-function copyDir(src, dest) {
+function copyDir(src, dest, filter = null) {
   if (!fs.existsSync(src)) return 0;
   let n = 0;
   for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
     const s = path.join(src, entry.name);
     const d = path.join(dest, entry.name);
-    if (entry.isDirectory()) { n += copyDir(s, d); continue; }
+    if (filter && !filter(s, entry)) continue;
+    if (entry.isDirectory()) { n += copyDir(s, d, filter); continue; }
     fs.mkdirSync(path.dirname(d), { recursive: true });
     fs.copyFileSync(s, d);
     n++;
@@ -197,6 +199,14 @@ function build() {
 
   // 静态资源
   const assetCount = copyDir(ASSETS_DIR, path.join(OUT, 'assets'));
+
+  // galleries/ 里的图片（文章正文贴图、图集配图）也进构建产物；
+  // 只复制图片类文件，.md 说明文件不发布到线上。
+  const isImage = (f) => /\.(png|jpe?g|gif|webp|svg|avif|ico)$/i.test(f);
+  const galleryCount = copyDir(GALLERIES_DIR, path.join(OUT, 'galleries'), (s, entry) => {
+    if (entry.isDirectory()) return true;
+    return isImage(entry.name);
+  });
   write('favicon.svg', FAVICON);
   write('robots.txt', `User-agent: *\nAllow: /\n${site.url ? `Sitemap: ${site.url.replace(/\/+$/, '')}${url('/sitemap.xml')}\n` : ''}`);
 
@@ -272,7 +282,7 @@ function build() {
 
   const ms = Date.now() - t0;
   log(`✅ 构建完成（${ms}ms）`);
-  log(`   文章 ${posts.length} 篇 · 标签 ${allTags.length} 个 · 独立页面 ${pages.length} 个 · 资源 ${assetCount} 个`);
+  log(`   文章 ${posts.length} 篇 · 标签 ${allTags.length} 个 · 独立页面 ${pages.length} 个 · 资源 ${assetCount + galleryCount} 个`);
   log(`   ${posts.slice(0, 3).map((p) => p.title).join(' / ')}${posts.length > 3 ? ' …' : ''}`);
   log(`   输出目录：${OUT}\n`);
 }

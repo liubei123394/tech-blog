@@ -382,7 +382,7 @@ export function renderCoverTool({ site, url }) {
   const content = `<section class="wrap page-head">
   <nav class="crumb"><a href="${url('/')}">首页</a><span>/</span><span>公众号封面工具</span></nav>
   <h1 class="page-title">公众号封面设计器</h1>
-  <p class="page-desc">内置 2.35:1（1800×766）公众号头条封面模板，与 <code>npm run sync</code> 的自动封面同款。输入标题与摘要，实时预览，一键导出 PNG。也支持 <code>?title=标题&amp;summary=摘要&amp;tags=a,b</code> 参数预填。</p>
+  <p class="page-desc">公众号封面 / 贴图设计器：支持 2.35:1 文章封面、1:1 贴图封面与小红书方图、3:4 小红书竖图等多种比例，内置五套模板，与 <code>npm run sync</code> 的自动封面同款。输入标题与摘要，实时预览，一键导出 PNG。也支持 <code>?title=标题&amp;summary=摘要&amp;ratio=1:1&amp;tags=a,b</code> 参数预填。</p>
 </section>
 <section class="wrap section" id="cover-tool-root"></section>
 <script src="${url('/assets/cover-tool.js')}" data-base="${h(url(''))}" defer></script>`;
@@ -392,7 +392,7 @@ export function renderCoverTool({ site, url }) {
     url,
     page: {
       title: '公众号封面工具',
-      description: '在线生成 2.35:1 公众号头条封面：内置五套模板，实时预览，一键导出 PNG。',
+      description: '在线生成公众号封面与贴图：2.35:1 / 1:1 / 3:4 等多种比例，五套模板，实时预览，一键导出 PNG。',
       active: 'cover',
       path: '/cover.html',
     },
