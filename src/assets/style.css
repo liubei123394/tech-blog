@@ -216,7 +216,16 @@ a:hover { color: var(--accent); }
   font-size: clamp(28px, 4.4vw, 42px); line-height: 1.25;
   letter-spacing: -1px; margin: 0 0 18px; font-weight: 700;
 }
-.hero-intro { font-size: 16.5px; color: var(--text-2); max-width: 660px; margin: 0 0 26px; line-height: 1.85; }
+.hero-intro { font-size: 16.5px; color: var(--text-2); max-width: 660px; margin: 0 0 18px; line-height: 1.85; }
+
+/* 首页「实训工具箱」外链入口：沿用按钮令牌，只作跳转不嵌入工具 */
+.hero-toolbox {
+  margin: 0 0 26px; padding: 10px 18px; font-size: 14.5px; font-weight: 600;
+  box-shadow: 0 8px 20px -12px rgba(47, 111, 237, .75);
+}
+.hero-toolbox:hover { transform: translateY(-1px); }
+.hero-toolbox span:first-child { font-size: 13px; }
+.hero-toolbox span:last-child { font-size: 12px; opacity: .85; }
 
 .hero-stats { display: flex; gap: 24px; flex-wrap: wrap; font-size: 13.5px; color: var(--text-3); }
 .hero-stats strong { color: var(--text); font-weight: 600; }

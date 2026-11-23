@@ -174,6 +174,13 @@ export function renderHome({ site, url, posts, stats }) {
   <div class="wrap">
     <h1 class="hero-title">${h(site.home.heading)}</h1>
     <p class="hero-intro">${h(site.home.intro)}</p>
+    ${
+      site.home.toolbox && site.home.toolbox.href
+        ? `<a class="btn btn-primary hero-toolbox" href="${h(url(site.home.toolbox.href))}" target="_blank" rel="noopener noreferrer" title="${h(site.home.toolbox.desc || '')}">
+      <span aria-hidden="true">▣</span>${h(site.home.toolbox.label || '实训工具箱')}<span aria-hidden="true">↗</span>
+    </a>`
+        : ''
+    }
     <div class="hero-stats">
       <span><strong>${stats.posts}</strong> 篇文章</span>
       <span><strong>${stats.tags}</strong> 个标签</span>
